@@ -69,3 +69,5 @@ coverage/
 
 # Atris
 atris/
+key_pair/
+*.pem
