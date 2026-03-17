@@ -23,11 +23,6 @@ export default function DetectionMetrics({ isActive }: DetectionMetricsProps) {
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
-    if (!isActive) {
-      setStats(null);
-      return;
-    }
-
     const poll = async () => {
       try {
         const data = await getDetectionStats();
@@ -37,6 +32,7 @@ export default function DetectionMetrics({ isActive }: DetectionMetricsProps) {
       }
     };
 
+    // Always poll — don't clear stats when isActive toggles
     poll();
     pollRef.current = setInterval(poll, 3000);
     return () => {
@@ -44,7 +40,7 @@ export default function DetectionMetrics({ isActive }: DetectionMetricsProps) {
     };
   }, [isActive]);
 
-  if (!isActive || !stats || stats.total_flows_scored === 0) {
+  if (!stats || stats.total_flows_scored === 0) {
     return (
       <div className="glass rounded-xl p-5">
         <h2 className="text-sm font-bold tracking-[0.2em] text-white uppercase mb-4">
