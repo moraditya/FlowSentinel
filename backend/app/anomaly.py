@@ -135,11 +135,18 @@ class AnomalyDetector:
         # Clear timing metadata now that collection is complete
         self._started_at = None
         self._duration_seconds = 0
-        self.save()
-        logger.info(
-            "Baseline model trained on %d samples and saved to disk",
-            len(self._collection_buffer),
-        )
+        try:
+            self.save()
+            logger.info(
+                "Baseline model trained on %d samples and saved to disk",
+                len(self._collection_buffer),
+            )
+        except PermissionError:
+            logger.warning(
+                "Baseline model trained on %d samples (in-memory only — "
+                "could not save to disk due to permissions)",
+                len(self._collection_buffer),
+            )
 
     # ── Scoring ───────────────────────────────────────────────────────
 
