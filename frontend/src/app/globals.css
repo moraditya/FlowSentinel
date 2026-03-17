@@ -1,0 +1,248 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --cyber-cyan: #00f0ff;
+  --cyber-red: #ff3333;
+  --cyber-green: #00ff88;
+  --cyber-bg: #0a0a0f;
+  --cyber-card: #0d1117;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--cyber-bg);
+  color: #e2e8f0;
+  font-family: 'Inter', system-ui, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Background Grid Pattern */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(0, 240, 255, 0.04) 1px, transparent 0);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Scan line overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 240, 255, 0.08) 25%,
+    rgba(0, 240, 255, 0.15) 50%,
+    rgba(0, 240, 255, 0.08) 75%,
+    transparent 100%
+  );
+  animation: scan-line 4s linear infinite;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+@keyframes scan-line {
+  0% { transform: translateY(-10px); }
+  100% { transform: translateY(100vh); }
+}
+
+/* Glow utility classes */
+@layer utilities {
+  .glow-cyan {
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.15), 0 0 30px rgba(0, 240, 255, 0.05);
+  }
+
+  .glow-cyan-strong {
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.3), 0 0 40px rgba(0, 240, 255, 0.1);
+  }
+
+  .glow-red {
+    box-shadow: 0 0 15px rgba(255, 51, 51, 0.15), 0 0 30px rgba(255, 51, 51, 0.05);
+  }
+
+  .glow-green {
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.15), 0 0 30px rgba(0, 255, 136, 0.05);
+  }
+
+  .text-glow-cyan {
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.5);
+  }
+
+  .text-glow-red {
+    text-shadow: 0 0 10px rgba(255, 51, 51, 0.5);
+  }
+
+  .text-glow-green {
+    text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+  }
+
+  .border-glow {
+    border: 1px solid rgba(0, 240, 255, 0.1);
+  }
+
+  .glass {
+    background: rgba(13, 17, 23, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 240, 255, 0.08);
+  }
+
+  .glass-strong {
+    background: rgba(13, 17, 23, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 240, 255, 0.12);
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 240, 255, 0.15);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 240, 255, 0.3);
+}
+
+/* Threat Feed Animations */
+@keyframes feed-entry {
+  0% {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.98);
+    max-height: 0;
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    max-height: 80px;
+  }
+}
+
+.feed-item-enter {
+  animation: feed-entry 0.4s ease-out forwards;
+}
+
+/* Pulse dot animation */
+@keyframes pulse-dot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.5);
+  }
+}
+
+.pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+/* Loading skeleton */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 240, 255, 0.03) 25%,
+    rgba(0, 240, 255, 0.08) 50%,
+    rgba(0, 240, 255, 0.03) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+  border-radius: 4px;
+}
+
+/* Number/Data styling */
+.data-value {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -0.02em;
+}
+
+/* Input styling */
+input[type="number"] {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 240, 255, 0.1);
+  color: #e2e8f0;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input[type="number"]:focus {
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.15);
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  opacity: 0.3;
+}
+
+/* Recharts custom styles */
+.recharts-default-tooltip {
+  background: rgba(13, 17, 23, 0.95) !important;
+  border: 1px solid rgba(0, 240, 255, 0.2) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5) !important;
+}
+
+.recharts-tooltip-label {
+  color: #00f0ff !important;
+  font-weight: 600 !important;
+}
+
+.recharts-tooltip-item {
+  color: #e2e8f0 !important;
+}
+
+.recharts-legend-item-text {
+  color: #94a3b8 !important;
+  font-size: 0.75rem !important;
+}

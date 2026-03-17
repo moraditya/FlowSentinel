@@ -1,0 +1,12 @@
+__pycache__
+*.pyc
+*.pyo
+.env
+.env.*
+models/*.joblib
+.git
+.gitignore
+.venv
+venv
+*.egg-info
+.pytest_cache

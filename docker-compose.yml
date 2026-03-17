@@ -1,0 +1,55 @@
+version: "3.9"
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: nids-backend
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./backend/data:/app/data
+      - ./backend/models:/app/models
+      - ./backend/demo:/app/demo
+    environment:
+      - NIDS_MODE=demo
+      - CORS_ORIGINS=http://localhost:3001,http://localhost:3000
+      - NIDS_API_KEY=${NIDS_API_KEY:-dev-key-change-me}
+      - NIDS_CAPTURE_INTERFACE=${NIDS_CAPTURE_INTERFACE:-}
+    cap_add:
+      - NET_ADMIN
+      - NET_RAW
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - nids-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        - NEXT_PUBLIC_API_URL=http://localhost:8000
+    container_name: nids-frontend
+    ports:
+      - "${FRONTEND_PORT:-3001}:3000"
+    environment:
+      - NIDS_MODE=demo
+      - BACKEND_URL=http://backend:8000
+      - NIDS_API_KEY=${NIDS_API_KEY:-dev-key-change-me}
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - nids-network
+    restart: unless-stopped
+
+networks:
+  nids-network:
+    driver: bridge
