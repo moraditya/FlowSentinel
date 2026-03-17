@@ -29,7 +29,6 @@ function derivePhase(
   if (!cap.is_capturing) return "idle";
   if (base.status === "collecting") return "baseline";
   if (base.status === "ready") return "monitoring";
-  // Capture is running but no baseline — still idle-ish (pre-baseline)
   return "idle";
 }
 
@@ -44,6 +43,8 @@ export default function LiveCapture({ onCaptureStateChange, onCaptureError }: Li
   ];
   const [baselineDuration, setBaselineDuration] = useState(60);
   const [phase, setPhase] = useState<Phase>("idle");
+  const [hasBaseline, setHasBaseline] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
 
   const [captureStatus, setCaptureStatus] = useState<CaptureStatusResponse>({
     is_capturing: false,
@@ -64,6 +65,7 @@ export default function LiveCapture({ onCaptureStateChange, onCaptureError }: Li
   const [error, setError] = useState<string | null>(null);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const prevPhaseRef = useRef<Phase>("idle");
 
   const pollStatus = useCallback(async () => {
     try {
@@ -74,10 +76,22 @@ export default function LiveCapture({ onCaptureStateChange, onCaptureError }: Li
       setCaptureStatus(cap);
       setBaselineStatus(base);
 
-      // Always derive phase from backend state — survives page refresh
       const derived = derivePhase(cap, base);
+
+      // Detect baseline completion transition
+      if (prevPhaseRef.current === "baseline" && derived === "monitoring") {
+        setHasBaseline(true);
+        setToast("Baseline secured. Monitoring active.");
+        setTimeout(() => setToast(null), 4000);
+      }
+
+      prevPhaseRef.current = derived;
       setPhase(derived);
       onCaptureStateChange?.(cap.is_capturing, derived);
+
+      if (base.status === "ready") {
+        setHasBaseline(true);
+      }
 
       if (cap.error && !cap.is_capturing) {
         setError(cap.error);
@@ -98,7 +112,6 @@ export default function LiveCapture({ onCaptureStateChange, onCaptureError }: Li
   const handleStart = async () => {
     setError(null);
     try {
-      // Step 1: Start capture
       const capRes = await startCapture(iface, "");
       setCaptureStatus(capRes);
 
@@ -108,11 +121,9 @@ export default function LiveCapture({ onCaptureStateChange, onCaptureError }: Li
         return;
       }
 
-      // Step 2: Begin baseline collection (backend owns the timer)
       const baseRes = await collectBaseline(baselineDuration);
       setBaselineStatus(baseRes);
 
-      // Optimistic phase update (poll will confirm)
       setPhase("baseline");
       onCaptureStateChange?.(true, "baseline");
     } catch (err) {
@@ -152,7 +163,6 @@ export default function LiveCapture({ onCaptureStateChange, onCaptureError }: Li
     monitoring: "text-cyber-green",
   };
 
-  // Progress from backend
   const progressPct =
     phase === "baseline" && baselineStatus.duration_seconds > 0
       ? ((baselineStatus.duration_seconds - baselineStatus.seconds_remaining) /
@@ -164,6 +174,13 @@ export default function LiveCapture({ onCaptureStateChange, onCaptureError }: Li
 
   return (
     <div className="glass rounded-xl p-5 space-y-4">
+      {/* Toast notification */}
+      {toast && (
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 z-50 px-6 py-3 rounded-lg bg-cyber-green/20 border border-cyber-green/30 text-cyber-green text-sm font-mono animate-pulse">
+          {toast}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="relative flex items-center justify-center">
@@ -214,7 +231,7 @@ export default function LiveCapture({ onCaptureStateChange, onCaptureError }: Li
               onClick={handleStart}
               className="px-4 py-2 text-xs font-mono font-bold rounded-lg bg-cyber-green/10 text-cyber-green border border-cyber-green/20 hover:bg-cyber-green/20 transition-colors"
             >
-              START CAPTURE
+              {hasBaseline ? "RESTART CAPTURE" : "START CAPTURE"}
             </button>
           </div>
         </div>
