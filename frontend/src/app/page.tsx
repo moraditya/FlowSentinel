@@ -54,9 +54,14 @@ export default function Dashboard() {
     fetchInitialData();
   }, [fetchInitialData]);
 
+  const prevCapturePhase = useRef<string>("idle");
   const handleCaptureStateChange = useCallback((capturing: boolean, phase: "idle" | "baseline" | "monitoring") => {
+    // Only clear events on the first transition INTO monitoring, not every poll
+    if (phase === "monitoring" && prevCapturePhase.current !== "monitoring") {
+      setEvents([]);
+    }
+    prevCapturePhase.current = phase;
     setCapturePhase(phase);
-    if (phase === "monitoring") setEvents([]);
   }, []);
 
   const handleCaptureError = useCallback((err: string) => {
