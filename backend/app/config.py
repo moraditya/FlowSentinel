@@ -30,6 +30,9 @@ def _default_interface() -> str:
     if iface:
         return iface
     if _MODE == "production":
+        # Modern Ubuntu/AWS uses enX0; fall back to eth0 for older systems
+        if os.path.exists("/sys/class/net/enX0"):
+            return "enX0"
         return "eth0"
     return "lo0" if platform.system() == "Darwin" else "lo"
 

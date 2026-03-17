@@ -163,7 +163,7 @@ export default function Dashboard() {
         />
 
         {/* Isolation Forest Detection Metrics */}
-        <DetectionMetrics isActive={capturePhase === "monitoring"} />
+        <DetectionMetrics isActive={capturePhase === "monitoring" || hasEvents} />
       </main>
     </>
   );
