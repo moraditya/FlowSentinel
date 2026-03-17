@@ -33,7 +33,7 @@ function derivePhase(
 }
 
 export default function LiveCapture({ onCaptureStateChange, onCaptureError }: LiveCaptureProps) {
-  const [iface, setIface] = useState("en0");
+  const [iface, setIface] = useState("");
   const DURATION_OPTIONS = [
     { label: "60s", value: 60 },
     { label: "2 min", value: 120 },
@@ -213,7 +213,7 @@ export default function LiveCapture({ onCaptureStateChange, onCaptureError }: Li
               type="text"
               value={iface}
               onChange={(e) => setIface(e.target.value)}
-              placeholder="Interface"
+              placeholder="Interface (auto-detect)"
               className="bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-xs font-mono text-gray-300 focus:border-cyber-cyan/50 focus:outline-none"
             />
             <select
