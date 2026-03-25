@@ -1,6 +1,6 @@
 # NIDS Platform
 
-Real-time network anomaly detection platform with live packet capture, PCAP replay, and benchmarked unsupervised baselines across two modern IDS datasets.
+Real-time network anomaly detection platform with live packet capture, PCAP replay, and benchmarked unsupervised baselines across two modern IDS datasets. See here: http://18.117.98.102:3000/ 
 
 The system captures live traffic, learns what "normal" looks like from the user's own baseline, and flags unusual flows using an Isolation Forest. Five unsupervised detection methods are benchmarked against a supervised ceiling on UNSW-NB15 and CIC-IDS-2018. A PCAP replay engine enables deterministic demos without root access.
 
